@@ -1,9 +1,5 @@
 using UnityEngine;
 using Neo4j.Driver;
-using System.Collections.Generic;
-using System;
-using UnityEditor.Experimental.GraphView;
-using System.Linq;
 
 public class Neo4jConnection : MonoBehaviour
 {
