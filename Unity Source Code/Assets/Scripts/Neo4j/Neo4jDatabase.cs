@@ -23,10 +23,10 @@ namespace Database
         }
 
         // Get data from custom query
-        public async Task<List<INode>> CustomFetch(string cypherQuery)
+        public async Task<List<INode>> CustomFetch(string cypherQuery) // Actually, can use any type for List content.
         {
 
-            var data = new List<INode>();
+            var nodes = new List<INode>();
             var result = await session.RunAsync(cypherQuery);
 
             await result.ForEachAsync(record =>
@@ -36,28 +36,37 @@ namespace Database
                 //{
                 //    Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
                 //}
-                foreach (var item in node.Labels) 
+                //foreach (var item in node.Labels) 
+                //{
+                //    Debug.Log(item.ToString());
+                //}
+                if (node != null)
                 {
-                    Debug.Log(item.ToString());
+                    nodes.Add(node);
                 }
 
             });
-            return data;
+
+            return nodes;
         }
 
         // Obtain the complete data of the database as a List of Nodes
         public async Task<List<INode>> GetAllData()
         {
 
-            var data = new List<INode>();
+            var nodes = new List<INode>();
             var result = await session.RunAsync("MATCH (n) RETURN n");
 
             await result.ForEachAsync(record =>
             {
                 var node = record["n"].As<INode>();
+                if (node != null)
+                {
+                    nodes.Add(node);
+                }
 
             });
-            return data;
+            return nodes;
         }
 
 
