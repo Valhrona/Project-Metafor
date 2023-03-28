@@ -9,10 +9,10 @@ namespace Database
     public class Neo4jDatabase
     {
 
-        private string databaseName { get; set; }
-        private string uri { get; set; }
-        private string username { get; set; }
-        private string password { get; set; }
+        public string databaseName { get; set; }
+        public string uri {private get; set; }
+        public string username { private get; set; }
+        public string password { private get; set; }
         private IAsyncSession session;
 
         // Initialize database such that it request and responses can be handled
@@ -32,8 +32,14 @@ namespace Database
             await result.ForEachAsync(record =>
             {
                 var node = record["n"].As<INode>();
-                //Debug.Log(node.ElementId.Split(':').Last());
-                Debug.Log(node.Properties);
+                //foreach (var kvp in node.Properties)
+                //{
+                //    Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+                //}
+                foreach (var item in node.Labels) 
+                {
+                    Debug.Log(item.ToString());
+                }
 
             });
             return data;
@@ -49,8 +55,6 @@ namespace Database
             await result.ForEachAsync(record =>
             {
                 var node = record["n"].As<INode>();
-                //Debug.Log(node.ElementId.Split(':').Last());
-                Debug.Log(node.Properties);
 
             });
             return data;
