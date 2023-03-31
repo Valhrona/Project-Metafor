@@ -27,7 +27,7 @@ public class Neo4jConnection : MonoBehaviour
         //Establish connection with local running Neo4j instance
         currentDatabase.Init();
 
-        results = await currentDatabase.CustomFetch("MATCH (n:Resource) RETURN n LIMIT 25");
+        results = await currentDatabase.CustomFetch("MATCH (n:ns0__APM_CDE) RETURN n LIMIT 25");
         foreach (var node in results)
         {
             var id = node.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)

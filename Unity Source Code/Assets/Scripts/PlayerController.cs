@@ -12,9 +12,8 @@ public class PlayerController : MonoBehaviour
     private float verticalCameraInput;
 
     private float verticalMovement;
-
+    private Vector3 moveDirection;
     private Rigidbody playerRb;
-    private float forceMultiplier = 10.0f;
     public float sensitivity = 10f;
 
     Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
@@ -23,15 +22,16 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
+        playerRb.freezeRotation = true;
     }
 
     // Update is called once per frame
     void Update()
     {
         // Obtain frontal movement input
-        frontalMovementInput = Input.GetAxis("Horizontal");
+        frontalMovementInput = Input.GetAxisRaw("Vertical");
         // Obtain sideways movement input
-        sidewayMovementInput = Input.GetAxis("Vertical");
+        sidewayMovementInput = Input.GetAxisRaw("Horizontal");
         // Obtain horizontal camera movement input
         horizontalCameraInput = Input.GetAxis("Mouse X");
         // Obtain vertical camera movement input
@@ -39,9 +39,9 @@ public class PlayerController : MonoBehaviour
         // Obtain vertical movement input
         verticalMovement = Input.GetAxis("QandE");
         // Forward movement
-        transform.Translate(Vector3.forward * speed * Time.deltaTime * frontalMovementInput);
+        transform.position += transform.forward * Time.deltaTime * speed * frontalMovementInput;
         // Sideways movement
-        transform.Translate(Vector3.right * speed * Time.deltaTime * sidewayMovementInput);
+        transform.position += transform.right * Time.deltaTime * speed * sidewayMovementInput;
         // Vertical movement
         transform.Translate(Vector3.up * speed * Time.deltaTime * verticalMovement);
         // Only rotate if inside playmode screen
