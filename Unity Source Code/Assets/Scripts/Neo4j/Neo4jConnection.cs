@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using UnityEditor.Experimental.GraphView;
 using TMPro;
+using GraphFoundation;
 
 public class Neo4jConnection : MonoBehaviour
 {
@@ -37,8 +38,8 @@ public class Neo4jConnection : MonoBehaviour
         results = await currentDatabase.CustomFetch("MATCH (n:ns0__APM_CDE) RETURN n LIMIT 25");
         for (int index = 0; index < results.Count; index++)
         {   
-            var id = results[index].Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
-            var _labels = results[index].Labels; // get Node labels
+            int id = (int)results[index].Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
+            var labels = results[index].Labels; // get Node labels
             var _properties = results[index].Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
             if (index == 0) // SORRY THIS IS HARDCODING LAZY BUT ITS FOR TESTING PURPOSES
             {
@@ -52,18 +53,12 @@ public class Neo4jConnection : MonoBehaviour
             {
                 member = Instantiate(APM_CDE_NODE, new Vector3(0, -15, 50), Quaternion.identity);
             }
-            foreach (var kvp in _properties)
-            {
-                if (kvp.Key == "rdfs__label")
-                {
-                    Debug.Log(member.transform.GetComponentInChildren<TextMeshProUGUI>().text);
-                    member.transform.GetComponentInChildren<TextMeshProUGUI>().text = ((string)kvp.Value).Split(".")[1];
-                }
-            }
-            var labels = string.Join(", ", _labels);
-            //Debug.Log($"Node {id} has labels: {labels}.");
-            
+            var nodeAttributes = member.GetComponent<APM_CDE_behaviour>();
+            nodeAttributes.nodeID = id;
+            nodeAttributes.labels = (List<string>)labels;
+            nodeAttributes.properties = (Dictionary<string, object>)_properties;
         }
+
 
     }
 
