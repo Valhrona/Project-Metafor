@@ -35,6 +35,7 @@ public class Neo4jConnection : MonoBehaviour
             var _properties = node.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
             var labels = string.Join(", ", _labels);
             Debug.Log($"Node {id} has labels: {labels}");
+            
         }
 
     }
