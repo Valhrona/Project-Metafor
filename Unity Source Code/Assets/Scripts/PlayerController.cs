@@ -4,25 +4,29 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public float Sensitivity
+    {
+        get { return sensitivity; }
+        set { sensitivity = value; }
+    }
+
     private float speed = 10.0f;
     private float frontalMovementInput;
     private float sidewayMovementInput;
 
-    private float horizontalCameraInput;
-    private float verticalCameraInput;
-
     private float verticalMovement;
-    private Vector3 moveDirection;
-    private Rigidbody playerRb;
-    public float sensitivity = 10f;
 
     Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
+
+    [Range(0.1f, 9f)][SerializeField] float sensitivity = 2f;
+    [Tooltip("Limits vertical camera rotation. Prevents the flipping that happens when rotation goes above 90.")]
+    [Range(0f, 90f)][SerializeField] float yRotationLimit = 88f;
+
+    Vector2 rotation = Vector2.zero;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerRb = GetComponent<Rigidbody>();
-        playerRb.freezeRotation = true;
     }
 
     // Update is called once per frame
@@ -32,10 +36,6 @@ public class PlayerController : MonoBehaviour
         frontalMovementInput = Input.GetAxisRaw("Vertical");
         // Obtain sideways movement input
         sidewayMovementInput = Input.GetAxisRaw("Horizontal");
-        // Obtain horizontal camera movement input
-        horizontalCameraInput = Input.GetAxis("Mouse X");
-        // Obtain vertical camera movement input
-        verticalCameraInput = Input.GetAxis("Mouse Y");
         // Obtain vertical movement input
         verticalMovement = Input.GetAxis("QandE");
         // Forward movement
@@ -48,11 +48,18 @@ public class PlayerController : MonoBehaviour
         if (!screenRect.Contains(Input.mousePosition))
             return;
         // Camera movement
-        transform.Rotate(0, horizontalCameraInput * sensitivity, 0);
-        transform.Rotate(-verticalCameraInput * sensitivity, 0, 0);
+        rotation.x += Input.GetAxis("Mouse X") * sensitivity;
+        rotation.y += Input.GetAxis("Mouse Y") * sensitivity;
+        rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
+        var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
+        var yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
+
+        transform.localRotation = xQuat * yQuat;
         // Lock cursor in window and disable presence
         if (Input.GetMouseButtonDown(0))
+        {
             Cursor.lockState = CursorLockMode.Locked;
 
+        }
     }
 }
