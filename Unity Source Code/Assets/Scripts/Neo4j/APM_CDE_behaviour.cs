@@ -14,6 +14,7 @@ namespace GraphFoundation
         public int nodeID;
         public List<string> labels = new List<string>();
         public Dictionary<string,object> properties = new Dictionary<string,object>();
+
         public Camera CameraToMove;
         public float MovementSpeed = 0.5F;
         private LineRenderer drawLine;
@@ -24,11 +25,13 @@ namespace GraphFoundation
         private Quaternion CameraEndRotation;
         private bool DoMovement = false;
         private float LerpMovement = 0;
-        float rotationThreshold = 0.01f; // example rotation threshold
-
+        private GameObject PopUpUI;
+        private GameObject Attributes;
 
         void Start()
         {
+            PopUpUI = GameObject.FindGameObjectWithTag("NodeSpawner").transform.GetComponent<Neo4jConnection>().PopUpUI;
+            Attributes = GameObject.FindGameObjectWithTag("NodeSpawner").transform.GetComponent<Neo4jConnection>().AttributesCell;
             CameraToMove = Camera.main;
             foreach (var kvp in properties)
             {
@@ -48,8 +51,10 @@ namespace GraphFoundation
 
         private void Update()
         {
-            checkIfIntersectsWithCamera();
-            MoveToPointUpdate();
+     
+            checkIfIntersectsWithCamera(); // this method i also feel like it can be placed in PlayerController.cs 
+            // but issue is to change the color of the object
+            MoveToPointUpdate(); // method can actually be written as part of PlayerController.cs
             // have text always face camera
             transform.GetComponentInChildren<TextMeshProUGUI>().transform.RotateAround(transform.position, Vector3.up, 20 * Time.deltaTime);
         }
@@ -72,6 +77,14 @@ namespace GraphFoundation
                 Renderer renderer = hit.collider.GetComponent<Renderer>();
                 // Change the color of the object to yellow
                 renderer.material.color = Color.yellow;
+                // show PopUpUI;
+                PopUpUI.SetActive(true);
+                // show NodeID of object it intersects TODO this is hella cumbersome way. 
+                // it has to be written better. something along the lines of :
+                // if camera intersects with THIS object then change text
+                PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {hit.collider.GetComponent<APM_CDE_behaviour>().nodeID}";
+                Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {hit.collider.GetComponent<APM_CDE_behaviour>().properties["rdfs__label"]}\n" +
+                   $"URI: {hit.collider.GetComponent<APM_CDE_behaviour>().properties["uri"]}";
                 if (Input.GetMouseButtonDown(0))
                 {
                     CameraStartPosition = CameraToMove.transform.position;
@@ -84,6 +97,7 @@ namespace GraphFoundation
             }
             else
             {
+                PopUpUI.SetActive(false);
                 gameObject.GetComponent<Renderer>().material.color = Color.green;
             }
         }

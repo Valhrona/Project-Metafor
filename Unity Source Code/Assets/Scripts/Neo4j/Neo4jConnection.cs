@@ -17,10 +17,17 @@ public class Neo4jConnection : MonoBehaviour
     private Neo4jDatabase currentDatabase;
     private List<INode> results;
     private GameObject member;
+    public GameObject PopUpUI;
+    public GameObject AttributesCell;
 
 
     private async void Start()
     {
+        // set PopUpUI false on awake
+        PopUpUI = GameObject.FindGameObjectWithTag("PopUp");
+        AttributesCell = GameObject.FindGameObjectWithTag("Attributes");
+        PopUpUI.SetActive(false);
+
         GameObject APM_CDE_NODE = Resources.Load("Prefabs/APM_CDE_NODE", typeof(GameObject)) as GameObject;
 
         //Provide credentials.json path to connect to local Neo4j instance
