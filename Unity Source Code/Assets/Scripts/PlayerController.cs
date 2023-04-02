@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
         get { return sensitivity; }
         set { sensitivity = value; }
     }
-
+    public Quaternion xQuat;
+    public Quaternion yQuat;
     private float speed = 10.0f;
     private float frontalMovementInput;
     private float sidewayMovementInput;
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Limits vertical camera rotation. Prevents the flipping that happens when rotation goes above 90.")]
     [Range(0f, 90f)][SerializeField] float yRotationLimit = 88f;
 
-    Vector2 rotation = Vector2.zero;
+    public Vector2 rotation = Vector2.zero;
 
     // Start is called before the first frame update
     void Start()
@@ -50,9 +51,10 @@ public class PlayerController : MonoBehaviour
         // Camera movement
         rotation.x += Input.GetAxis("Mouse X") * sensitivity;
         rotation.y += Input.GetAxis("Mouse Y") * sensitivity;
+       
         rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
-        var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
-        var yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
+        xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
+        yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
 
         transform.localRotation = xQuat * yQuat;
         // Lock cursor in window and disable presence
