@@ -2,14 +2,11 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using Database;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Neo4j.Driver;
-using System;
-using System.Collections.ObjectModel;
-using UnityEditor.Experimental.GraphView;
-using TMPro;
 using GraphFoundation;
+using System.Diagnostics;
+using System;
 
 public class Neo4jConnection : MonoBehaviour
 {
@@ -17,13 +14,20 @@ public class Neo4jConnection : MonoBehaviour
     private Neo4jDatabase currentDatabase;
     private List<INode> results;
     private GameObject member;
+    private bool startingLine = false;
     public GameObject PopUpUI;
     public GameObject AttributesCell;
+    public string quitText = "Player Quits";
+    public Process process = new Process();
+    public ProcessStartInfo startInfo = new ProcessStartInfo();
 
 
     private async void Start()
     {
-        // set PopUpUI false on awake
+        // connect to Neo4j DBMS through command line
+        EstablishCLConnection();
+
+        // set PopUpUI false on awake AFTER we have the reference to it stored.
         PopUpUI = GameObject.FindGameObjectWithTag("PopUp");
         AttributesCell = GameObject.FindGameObjectWithTag("Attributes");
         PopUpUI.SetActive(false);
@@ -69,9 +73,40 @@ public class Neo4jConnection : MonoBehaviour
 
     }
 
-    private void Update()
+    private void EstablishCLConnection()
     {
+        startInfo.FileName = "cmd.exe"; //the application we want to execute, in this case its command line which is cmd.exe
+        startInfo.Arguments = "/C cd C:/Users/selsabrouty/.Neo4jDesktop/relate-data/dbmss/dbms-3fec07b2-1923-4bbf-9e7c-4c40b889bd27/bin && neo4j console"; // the command we want to execute
+        process.StartInfo = startInfo; // attach this info to the process
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        //process.StartInfo.CreateNoWindow = true; // No GUI
 
+        process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
+        {
+            if (e.Data.Contains("Started"))
+            {
+                startingLine = true;
+            }
+            UnityEngine.Debug.Log(e.Data);
+        });
+
+
+        process.Start();
+        process.BeginOutputReadLine();
+        while (!startingLine) { }
     }
 
+    private void Update()
+    {
+    }
+
+
+    // Terminate process when the application is stopped.
+    private void OnApplicationQuit()
+    {
+        process.Kill();
+
+    }
 }

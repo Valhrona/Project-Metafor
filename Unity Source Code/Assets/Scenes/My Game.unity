@@ -720,6 +720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PopUpUI: {fileID: 0}
   AttributesCell: {fileID: 0}
+  quitText: Player Quits
 --- !u!1 &1773781847
 GameObject:
   m_ObjectHideFlags: 0
