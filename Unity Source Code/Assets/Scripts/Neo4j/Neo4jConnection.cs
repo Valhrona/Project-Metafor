@@ -17,7 +17,6 @@ public class Neo4jConnection : MonoBehaviour
     private bool startingLine = false;
     public GameObject PopUpUI;
     public GameObject AttributesCell;
-    public string quitText = "Player Quits";
     public Process process = new Process();
     public ProcessStartInfo startInfo = new ProcessStartInfo();
 
@@ -26,11 +25,6 @@ public class Neo4jConnection : MonoBehaviour
     {
         // connect to Neo4j DBMS through command line
         EstablishCLConnection();
-
-        // set PopUpUI false on awake AFTER we have the reference to it stored.
-        PopUpUI = GameObject.FindGameObjectWithTag("PopUp");
-        AttributesCell = GameObject.FindGameObjectWithTag("Attributes");
-        PopUpUI.SetActive(false);
 
         GameObject APM_CDE_NODE = Resources.Load("Prefabs/APM_CDE_NODE", typeof(GameObject)) as GameObject;
 
