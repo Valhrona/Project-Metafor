@@ -1,7 +1,5 @@
 using GraphFoundation;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -78,7 +76,7 @@ public class PlayerController : MonoBehaviour
         }
 
         CheckIfIntersectsWithCamera();
-        MoveToPointUpdate(); 
+        MoveToPointUpdate();
     }
 
     private void ObtainMovement()
@@ -95,6 +93,8 @@ public class PlayerController : MonoBehaviour
         transform.position += transform.right * Time.deltaTime * speed * sidewayMovementInput;
         // Vertical movement
         transform.Translate(Vector3.up * speed * Time.deltaTime * verticalMovement);
+        // Mouse scroll movement
+        transform.Translate(Input.mouseScrollDelta.y * speed * transform.forward);
     }
 
     private void CheckIfIntersectsWithCamera()
@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour
         Ray ray = new Ray(transform.position,transform.forward);
 
         // Define a maximum distance for the raycast
-        float maxDistance = 80.0f;
+        float maxDistance = 120.0f;
 
         // Create a RaycastHit object to store the result of the raycast
         RaycastHit hit;
@@ -118,28 +118,42 @@ public class PlayerController : MonoBehaviour
             // show PopUpUI;
             PopUpUI.SetActive(true);
             focusedNode = hit.collider;
-            // show NodeID of object it intersects TODO this is hella cumbersome way. 
-            // it has to be written better. something along the lines of :
-            // if camera intersects with THIS object then change text
-            PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {hit.collider.GetComponent<APM_CDE_behaviour>().nodeID}";
-            Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {hit.collider.GetComponent<APM_CDE_behaviour>().properties["rdfs__label"]}\n" +
-               $"URI: {hit.collider.GetComponent<APM_CDE_behaviour>().properties["uri"]}";
+            // if camera intersects with THIS object then chasnge text
+            PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {hit.collider.GetComponent<NodeBehaviour>().nodeID}";
+            Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {hit.collider.GetComponent<NodeBehaviour>().properties["rdfs__label"]}\n" +
+               $"URI: {hit.collider.GetComponent<NodeBehaviour>().properties["uri"]}";
+            
+            // is lerping actually needed, more of a gimmick
+            // if node is clicked then unfold the node
             if (Input.GetMouseButtonDown(0))
             {
-                CameraStartPosition = transform.position;
-                CameraStartRotation = transform.rotation;
-                CameraEndPosition = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z - 50);
-                CameraEndRotation = Quaternion.identity;
-                LerpMovement = 0F;
-                DoMovement = true;
+                if (!focusedNode.transform.GetComponent<NodeBehaviour>().expanded) 
+                {
+                    focusedNode.transform.GetComponent<NodeBehaviour>().DoUnfolding();
+
+                }
+                else
+                {
+                    focusedNode.transform.GetComponent<NodeBehaviour>().UndoUnfolding();
+                }
+                
+
+                //    CameraStartPosition = transform.position;
+                //    CameraStartRotation = transform.rotation;
+                //    CameraEndPosition = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z - 70);
+                //    CameraEndRotation = Quaternion.identity;
+                //    LerpMovement = 0F;
+                //    DoMovement = true;
             }
         }
         else
         {
+            // Do not show PopUpUI when not in focus
             PopUpUI.SetActive(false);
             if (focusedNode != null)
             {
-                focusedNode.GetComponent<Renderer>().material.color = Color.green;
+                focusedNode.GetComponent<Renderer>().material.color = focusedNode.transform.GetComponent<NodeBehaviour>().defaultColor;
+                focusedNode = null;
             }
         }
     }

@@ -6,25 +6,25 @@ using System.Collections.Generic;
 using Neo4j.Driver;
 using GraphFoundation;
 using System.Diagnostics;
-using System;
+using UnityEngine.Networking.Types;
 
 public class Neo4jConnection : MonoBehaviour
 {
 
-    private Neo4jDatabase currentDatabase;
-    private List<INode> results;
-    private GameObject member;
-    private bool startingLine = false;
+    public Neo4jDatabase currentDatabase;
     public GameObject PopUpUI;
     public GameObject AttributesCell;
     public Process process = new Process();
     public ProcessStartInfo startInfo = new ProcessStartInfo();
+    private List<INode> results;
+    private GameObject member;
+    private bool startingLine = false;
 
 
     private async void Start()
     {
         // connect to Neo4j DBMS through command line
-        EstablishCLConnection();
+        //EstablishCLConnection();
 
         GameObject APM_CDE_NODE = Resources.Load("Prefabs/APM_CDE_NODE", typeof(GameObject)) as GameObject;
 
@@ -38,34 +38,29 @@ public class Neo4jConnection : MonoBehaviour
         currentDatabase = JsonConvert.DeserializeObject<Neo4jDatabase>(json);
 
         //Establish connection with local running Neo4j instance
-        currentDatabase.Init();
+        currentDatabase.Connect();
 
-        results = await currentDatabase.CustomFetch("MATCH (n:ns0__APM_CDE) RETURN n LIMIT 25");
+        // fetch the starting point nodes
+        results = await currentDatabase.CustomFetch("MATCH (n:ns0__APM_CDE) RETURN n LIMIT 1", "n");
         for (int index = 0; index < results.Count; index++)
-        {   
+        {
             int id = (int)results[index].Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
             var labels = results[index].Labels; // get Node labels
             var _properties = results[index].Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
-            if (index == 0) // SORRY THIS IS HARDCODING LAZY BUT ITS FOR TESTING PURPOSES
-            {
-                member = Instantiate(APM_CDE_NODE, new Vector3(-20, 15, 50), Quaternion.identity);
-            }
-            else if (index == 1)
-            {
-                member = Instantiate(APM_CDE_NODE, new Vector3(20, 15, 50), Quaternion.identity);
-            }
-            else 
-            {
-                member = Instantiate(APM_CDE_NODE, new Vector3(0, -15, 50), Quaternion.identity);
-            }
-            var nodeAttributes = member.GetComponent<APM_CDE_behaviour>();
+            float x = UnityEngine.Random.Range(0.05f, 0.95f);
+            float y = UnityEngine.Random.Range(0.05f, 0.95f);
+            Vector3 pos = new Vector3(0, 0, 120f);
+            member = Instantiate(APM_CDE_NODE, pos, Quaternion.identity);
+            var nodeAttributes = member.GetComponent<NodeBehaviour>();
+            member.name = $"Node_{id}";
             nodeAttributes.nodeID = id;
             nodeAttributes.labels = (List<string>)labels;
             nodeAttributes.properties = (Dictionary<string, object>)_properties;
+            nodeAttributes.defaultColor = member.GetComponent<Renderer>().material.color;
         }
 
-
     }
+
 
     private void EstablishCLConnection()
     {

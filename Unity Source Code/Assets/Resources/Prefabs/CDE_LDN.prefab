@@ -224,9 +224,9 @@ GameObject:
   - component: {fileID: 521960966157494119}
   - component: {fileID: 521960966157494112}
   - component: {fileID: 521960966157494113}
-  - component: {fileID: -3177537474417345365}
+  - component: {fileID: -5969817578080240177}
   m_Layer: 0
-  m_Name: APM_CDE_NODE
+  m_Name: CDE_LDN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -276,7 +276,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f1625d9fe567a6947befa7e5ca5af0f0, type: 2}
+  - {fileID: 2100000, guid: 6ac10c0f1181ed948b097d64ef2e6372, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -311,7 +311,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-3177537474417345365
+--- !u!114 &-5969817578080240177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,4 +328,5 @@ MonoBehaviour:
   CameraToMove: {fileID: 0}
   MovementSpeed: 0.5
   expanded: 0
+  expandedNodes: []
   defaultColor: {r: 0, g: 0, b: 0, a: 0}

@@ -16,22 +16,21 @@ namespace Database
         private IAsyncSession session;
 
         // Initialize database such that it request and responses can be handled
-        public void Init()
+        public void Connect()
         {
             // Establish Neo4j connection with driver and start session linked to database
             session = GraphDatabase.Driver(uri, AuthTokens.Basic(username, password)).AsyncSession(o => o.WithDatabase(databaseName));
         }
 
         // Get data from custom query
-        public async Task<List<INode>> CustomFetch(string cypherQuery) // Actually, can use any type for List content.
+        public async Task<List<INode>> CustomFetch(string cypherQuery, params string[] keys) // Actually, can use any type for List content.
         {
 
             var nodes = new List<INode>();
             var result = await session.RunAsync(cypherQuery);
-
             await result.ForEachAsync(record =>
             {
-                var node = record["n"].As<INode>();
+                var node = record[keys[0]].As<INode>();
                 //foreach (var kvp in node.Properties)
                 //{
                 //    Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
