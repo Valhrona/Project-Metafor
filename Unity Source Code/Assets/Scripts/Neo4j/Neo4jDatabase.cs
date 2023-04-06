@@ -22,15 +22,25 @@ namespace Database
             session = GraphDatabase.Driver(uri, AuthTokens.Basic(username, password)).AsyncSession(o => o.WithDatabase(databaseName));
         }
 
-        // Get data from custom query
-        public async Task<List<INode>> CustomFetch(string cypherQuery, params string[] keys) // Actually, can use any type for List content.
+        // Get data from custom quersy
+        public async Task<List<(INode, IRelationship)>> CustomFetch(string cypherQuery, params string[] keys) // Actually, can use any type for List content.
         {
 
-            var nodes = new List<INode>();
+            var nodesAndRelationships = new List<(INode, IRelationship)>();
             var result = await session.RunAsync(cypherQuery);
             await result.ForEachAsync(record =>
             {
+
                 var node = record[keys[0]].As<INode>();
+                if (keys.Length > 1)
+                {
+                    var relationship = record[keys[1]].As<IRelationship>();
+                    nodesAndRelationships.Add((node, relationship));
+                }
+                else
+                {
+                    nodesAndRelationships.Add((node, null));
+                }
                 //foreach (var kvp in node.Properties)
                 //{
                 //    Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
@@ -38,15 +48,10 @@ namespace Database
                 //foreach (var item in node.Labels) 
                 //{
                 //    Debug.Log(item.ToString());
-                //}
-                if (node != null)
-                {
-                    nodes.Add(node);
-                }
+                //}zzzzzzzzz
 
             });
-
-            return nodes;
+            return nodesAndRelationships;
         }
 
         // Obtain the complete data of the database as a List of Nodes

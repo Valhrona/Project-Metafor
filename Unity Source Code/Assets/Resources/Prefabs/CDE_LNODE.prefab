@@ -223,10 +223,11 @@ GameObject:
   - component: {fileID: 521960966157494118}
   - component: {fileID: 521960966157494119}
   - component: {fileID: 521960966157494112}
+  - component: {fileID: 7518066350856952431}
   - component: {fileID: 521960966157494113}
   - component: {fileID: -5969817578080240177}
   m_Layer: 0
-  m_Name: CDE_LDN
+  m_Name: CDE_LNODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -298,6 +299,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &7518066350856952431
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521960966157494114}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!135 &521960966157494113
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -309,7 +326,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.8
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-5969817578080240177
 MonoBehaviour:
@@ -329,4 +346,6 @@ MonoBehaviour:
   MovementSpeed: 0.5
   expanded: 0
   expandedNodes: []
+  expandedEdges: []
+  joints: []
   defaultColor: {r: 0, g: 0, b: 0, a: 0}
