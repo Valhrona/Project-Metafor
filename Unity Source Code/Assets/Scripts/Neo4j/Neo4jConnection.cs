@@ -1,13 +1,12 @@
 using UnityEngine;
-using System.IO;
 using Newtonsoft.Json;
 using Database;
 using System.Collections.Generic;
 using Neo4j.Driver;
 using GraphFoundation;
 using System.Diagnostics;
-using UnityEngine.Networking.Types;
 using System;
+using File = System.IO.File;
 
 public class Neo4jConnection : MonoBehaviour
 {
@@ -20,14 +19,15 @@ public class Neo4jConnection : MonoBehaviour
     private List<(INode, IRelationship)> results;
     private GameObject startingNode;
     private bool startingLine = false;
-
+    private string startupQuery = "MATCH (n:ns0__APM_CDE) RETURN n";
+    private string[] startupKeys;
 
     private async void Start()
     {
         // connect to Neo4j DBMS through command line
         //EstablishClientConnection();
-
-        GameObject APM_CDE_NODE = Resources.Load("Prefabs/APM_CDE_NODE", typeof(GameObject)) as GameObject;
+      
+        GameObject APM_CDE_NODE = Resources.Load("Prefabs/APM_CDE", typeof(GameObject)) as GameObject;
 
         //Provide credentials.json path to connect to local Neo4j instance
         string credentialsFile = "Assets/Scripts/Neo4j/credentials.json";
@@ -41,8 +41,10 @@ public class Neo4jConnection : MonoBehaviour
         //Establish connection with local running Neo4j instance
         currentDatabase.Connect();
 
+        startupKeys = currentDatabase.GetKeys(startupQuery);
+
         // fetch the starting point nodes
-        results = await currentDatabase.CustomFetch("MATCH (n:ns0__APM_CDE) RETURN n", "n");
+        results = await currentDatabase.CustomFetch(startupQuery, startupKeys);
         for (int index = 0; index < results.Count; index++)
         {
             int id = (int)results[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
@@ -57,6 +59,7 @@ public class Neo4jConnection : MonoBehaviour
             /* Get the spawn po sition */ /* Get the spawn position */
             var spawnPos = new Vector3(0,0,120f) + spawnDir * 20; // Radius is just the distance away from the point
             startingNode = Instantiate(APM_CDE_NODE, spawnPos, Quaternion.identity);
+            startingNode.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
             var nodeAttributes = startingNode.GetComponent<NodeBehaviour>();
             startingNode.name = $"Node_{id}";
             nodeAttributes.nodeID = id;
@@ -66,7 +69,6 @@ public class Neo4jConnection : MonoBehaviour
         }
 
     }
-
 
     private void EstablishClientConnection()
     {

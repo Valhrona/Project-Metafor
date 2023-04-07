@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private GameObject PopUpUI;
     private GameObject Attributes;
     private Collider focusedNode;
+    private bool freeze;
 
     // Start is called before the first frame update
     void Start()
@@ -49,10 +50,25 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Get user movement from keyboard
-;       ObtainMovement();
-        // Get user mouse movement
-        ObtainLook();
+        if ( Input.GetKeyDown(KeyCode.Escape) == true )
+        {
+            if (!freeze)
+            {
+                freeze = true;
+            }
+            else
+            {
+                freeze = false;
+            }
+        }
+        if (!freeze) 
+        {
+            // Get user movement from keyboard
+            ObtainMovement();
+            // Get user mouse movement
+            ObtainLook();
+        }
+
     }
 
     private void ObtainLook()
@@ -70,10 +86,10 @@ public class PlayerController : MonoBehaviour
 
         transform.localRotation = xQuat * yQuat;
         // Lock cursor in window and disable presence
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Cursor.lockState = CursorLockMode.Locked;
+        //}
 
         CheckIfIntersectsWithCamera();
         MoveToPointUpdate();

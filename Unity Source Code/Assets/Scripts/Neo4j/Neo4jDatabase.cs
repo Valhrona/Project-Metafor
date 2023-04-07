@@ -1,4 +1,5 @@
 ﻿using Neo4j.Driver;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -41,15 +42,6 @@ namespace Database
                 {
                     nodesAndRelationships.Add((node, null));
                 }
-                //foreach (var kvp in node.Properties)
-                //{
-                //    Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
-                //}
-                //foreach (var item in node.Labels) 
-                //{
-                //    Debug.Log(item.ToString());
-                //}zzzzzzzzz
-
             });
             return nodesAndRelationships;
         }
@@ -73,6 +65,16 @@ namespace Database
             return nodes;
         }
 
+        public string[] GetKeys(string query)
+        {
+            var keys = query.ToLower().Split(new string[] { "return" }, StringSplitOptions.None)[1].Split(new string[] { "," }, StringSplitOptions.None);
+            for (int index = 0; index < keys.Length;)
+            {
+                keys[index] = keys[index].Trim();
+                index++;
+            }
+            return keys;
+        }
 
         // Empty the Neo4j database
         async void DeleteData()

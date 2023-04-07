@@ -23,20 +23,18 @@ namespace GraphFoundation
         public List<SpringJoint> joints = new List<SpringJoint>();
         public Color defaultColor;
 
-        private GameObject CDE_LD_NODE;
         private GameObject EdgePrefab;
         private Neo4jDatabase database;
 
         void Start()
         {
-            CDE_LD_NODE = Resources.Load("Prefabs/CDE_LNODE", typeof(GameObject)) as GameObject;
             EdgePrefab = Resources.Load("Prefabs/EdgePrefab", typeof(GameObject)) as GameObject;
             database = GameObject.FindGameObjectWithTag("NodeSpawner").transform.GetComponent<Neo4jConnection>().currentDatabase;
             foreach (var kvp in properties)
             {
                 if (kvp.Key == "rdfs__label")
                 {
-                    transform.GetComponentInChildren<TextMeshProUGUI>().text = ((string)kvp.Value).Split(".")[1];
+                    transform.GetComponentInChildren<TextMeshProUGUI>().text = ((string)kvp.Value);
                 }
             };
         }
@@ -64,9 +62,11 @@ namespace GraphFoundation
 
         public async void DoUnfolding()
         {   
-            var result = await database.CustomFetch($"MATCH (n:ns0__APM_CDE)-[r]-(z) WHERE ID(n) = {nodeID} RETURN z, r LIMIT 3", "z", "r");
+
+            var result = await database.CustomFetch($"MATCH (n)-[r]-(z) WHERE ID(n) = {nodeID} RETURN z, r LIMIT 3", "z", "r");
             for (int index = 0; index < result.Count; index++)
             {
+                
                 int id = (int)result[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
                 var labels = result[index].Item1.Labels; // get Node labels
                 var _properties = result[index].Item1.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
@@ -76,10 +76,11 @@ namespace GraphFoundation
                 var horizontal = MathF.Cos((float)radians);
                 var spawnDir = new Vector3(horizontal, vertical, 0);
                 var spawnPos = transform.position + spawnDir * 30; // Radius is just the distance away from the point
-
-                var node = Instantiate(CDE_LD_NODE, spawnPos, Quaternion.identity);
+                string prefabText = labels[1].ToLower().Split(new string[] { "__" }, StringSplitOptions.None)[1];
+                var prefab = Resources.Load($"Prefabs/{prefabText}", typeof(GameObject)) as GameObject;
+                var node = Instantiate(prefab, spawnPos, Quaternion.identity);
                 node.name = $"Node_{id}";
-                
+                node.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
                 var nodeAttributes = node.GetComponent<NodeBehaviour>();
                 nodeAttributes.nodeID = id;
                 nodeAttributes.labels = (List<string>)labels;
@@ -122,7 +123,7 @@ namespace GraphFoundation
             sj.enableCollision = true;
             sj.connectedBody = n.transform.GetComponent<Rigidbody>();
             GameObject edge = Instantiate(EdgePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            
+            edge.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
             joints.Add(sj);
             expandedEdges.Add(edge);
         }

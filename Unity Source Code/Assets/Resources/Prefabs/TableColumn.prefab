@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: -3522194405927126291}
   - component: {fileID: -3177537474417345365}
   m_Layer: 0
-  m_Name: APM_CDE_NODE
+  m_Name: TableColumn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,7 +277,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f1625d9fe567a6947befa7e5ca5af0f0, type: 2}
+  - {fileID: 2100000, guid: c32b0a19825de0348929b0155d2b52cf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -346,4 +346,6 @@ MonoBehaviour:
   MovementSpeed: 0.5
   expanded: 0
   expandedNodes: []
+  expandedEdges: []
+  joints: []
   defaultColor: {r: 0, g: 0, b: 0, a: 0}
