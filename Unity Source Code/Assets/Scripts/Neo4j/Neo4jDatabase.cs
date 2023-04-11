@@ -29,20 +29,31 @@ namespace Database
 
             var nodesAndRelationships = new List<(INode, IRelationship)>();
             var result = await session.RunAsync(cypherQuery);
-            await result.ForEachAsync(record =>
-            {
 
-                var node = record[keys[0]].As<INode>();
-                if (keys.Length > 1)
+
+
+            try
+            {
+                await result.ForEachAsync(record =>
                 {
-                    var relationship = record[keys[1]].As<IRelationship>();
-                    nodesAndRelationships.Add((node, relationship));
-                }
-                else
-                {
-                    nodesAndRelationships.Add((node, null));
-                }
-            });
+
+                    var node = record[keys[0]].As<INode>();
+                    if (keys.Length > 1)
+                    {
+                        var relationship = record[keys[1]].As<IRelationship>();
+                        nodesAndRelationships.Add((node, relationship));
+                    }
+                    else
+                    {
+                        nodesAndRelationships.Add((node, null));
+                    }
+                });
+
+            }
+            catch (Exception) 
+            {
+                throw;
+            }
             return nodesAndRelationships;
         }
 

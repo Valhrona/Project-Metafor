@@ -29,13 +29,7 @@ public class QueryParser : MonoBehaviour
 
     public async void Listen()
     {
-        if (input.text == "") 
-        {
-
-            input.placeholder.GetComponent<TMP_Text>().text = "PLEASE ENTER VALID QUERY";
-            input.placeholder.GetComponent<TMP_Text>().color = Color.red;
-        }
-        else
+        try
         {
             string keyString = input.text.ToLower().Split(new string[] { "return" }, StringSplitOptions.None)[1];
             keys = keyString.Split(new string[] { "," }, StringSplitOptions.None);
@@ -43,18 +37,24 @@ public class QueryParser : MonoBehaviour
             {
                 key.Trim();
             }
-            ClearGraph();
+
             var x = await currentDatabase.CustomFetch(input.text, keys);
+            ClearGraph();
             for (int index = 0; index < x.Count; index++)
             {
 
                 int id = (int)x[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
                 var labels = x[index].Item1.Labels; // get Node labels
                 var _properties = x[index].Item1.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
-
-                Debug.Log(id);
             }
         }
+        catch (Exception)
+        {
+            input.text = "";
+            input.placeholder.GetComponent<TMP_Text>().text = "PLEASE ENTER VALID QUERY";
+            input.placeholder.GetComponent<TMP_Text>().color = Color.red;
+        }
+  
     }
 
     public void ClearGraph()
