@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Security.Cryptography;
+using GraphFoundation;
 
 public class QueryParser : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class QueryParser : MonoBehaviour
     {
     }
 
-    public void Listen()
+    public async void Listen()
     {
         if (input.text == "") 
         {
@@ -43,7 +44,16 @@ public class QueryParser : MonoBehaviour
                 key.Trim();
             }
             ClearGraph();
-            //currentDatabase.CustomFetch(input.text, keys);
+            var x = await currentDatabase.CustomFetch(input.text, keys);
+            for (int index = 0; index < x.Count; index++)
+            {
+
+                int id = (int)x[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
+                var labels = x[index].Item1.Labels; // get Node labels
+                var _properties = x[index].Item1.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
+
+                Debug.Log(id);
+            }
         }
     }
 

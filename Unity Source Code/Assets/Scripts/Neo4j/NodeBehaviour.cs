@@ -41,6 +41,8 @@ namespace GraphFoundation
 
         private void Update()
         {
+
+            GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
             int i = 0;
             foreach (GameObject edge in expandedEdges)
             {
@@ -62,7 +64,10 @@ namespace GraphFoundation
 
         public async void DoUnfolding()
         {   
-
+            if (GetComponent<Rigidbody>().velocity != new Vector3(0, 0, 0))
+            {
+                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+            }
             var result = await database.CustomFetch($"MATCH (n)-[r]-(z) WHERE ID(n) = {nodeID} RETURN z, r LIMIT 3", "z", "r");
             for (int index = 0; index < result.Count; index++)
             {
@@ -122,16 +127,13 @@ namespace GraphFoundation
             sj.connectedAnchor = new Vector3(0, 0, 0);
             sj.enableCollision = true;
             sj.connectedBody = n.transform.GetComponent<Rigidbody>();
+            sj.spring = 8;
             GameObject edge = Instantiate(EdgePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
             edge.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
             joints.Add(sj);
             expandedEdges.Add(edge);
         }
 
-        public void OnCollisionExit(Collision collision)
-        {
-            GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-        }
     }
 }
 
