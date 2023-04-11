@@ -24,29 +24,30 @@ namespace Database
         }
 
         // Get data from custom quersy
-        public async Task<List<(INode, IRelationship)>> CustomFetch(string cypherQuery, params string[] keys) // Actually, can use any type for List content.
+        public async Task<(List<INode>, List<IRelationship>)> CustomFetch(string cypherQuery, params string[] keys) // Actually, can use any type for List content.
         {
 
-            var nodesAndRelationships = new List<(INode, IRelationship)>();
+            var nodes = new List<INode>();
+            var relationships = new List<IRelationship>();
+            
             var result = await session.RunAsync(cypherQuery);
-
-
 
             try
             {
                 await result.ForEachAsync(record =>
                 {
-
-                    var node = record[keys[0]].As<INode>();
-                    if (keys.Length > 1)
+                    foreach(string key in keys)
                     {
-                        var relationship = record[keys[1]].As<IRelationship>();
-                        nodesAndRelationships.Add((node, relationship));
+                        if (record[key].GetType().ToString() == "Neo4j.Driver.Internal.Types.Node")
+                        {
+                            nodes.Add(record[key].As<INode>());
+                        }
+                        else
+                        {
+                            relationships.Add(record[key].As<IRelationship>());
+                        }
                     }
-                    else
-                    {
-                        nodesAndRelationships.Add((node, null));
-                    }
+                    
                 });
 
             }
@@ -54,26 +55,7 @@ namespace Database
             {
                 throw;
             }
-            return nodesAndRelationships;
-        }
-
-        // Obtain the complete data of the database as a List of Nodes
-        public async Task<List<INode>> GetAllData()
-        {
-
-            var nodes = new List<INode>();
-            var result = await session.RunAsync("MATCH (n) RETURN n");
-
-            await result.ForEachAsync(record =>
-            {
-                var node = record["n"].As<INode>();
-                if (node != null)
-                {
-                    nodes.Add(node);
-                }
-
-            });
-            return nodes;
+            return (nodes, relationships);
         }
 
         public string[] GetKeys(string query)
@@ -85,13 +67,6 @@ namespace Database
                 index++;
             }
             return keys;
-        }
-
-        // Empty the Neo4j database
-        async void DeleteData()
-        {
-            await session.RunAsync("MATCH (n) DETACH DELETE n");
-
         }
 
         // Clean up the Neo4j session when the script is destroyed

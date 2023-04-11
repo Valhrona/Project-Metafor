@@ -58,7 +58,7 @@ namespace GraphFoundation
                                   (transform.position.z + target.transform.position.z) / 2);
                 i++;
             }
-            // have text always face camera
+            // have text rotate around node
             transform.GetComponentInChildren<TextMeshProUGUI>().transform.RotateAround(transform.position, Vector3.up, 20 * Time.deltaTime);
         }
 
@@ -69,33 +69,33 @@ namespace GraphFoundation
                 GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
             }
             var result = await database.CustomFetch($"MATCH (n)-[r]-(z) WHERE ID(n) = {nodeID} RETURN z, r LIMIT 3", "z", "r");
-            for (int index = 0; index < result.Count; index++)
-            {
-                
-                int id = (int)result[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
-                var labels = result[index].Item1.Labels; // get Node labels
-                var _properties = result[index].Item1.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
-                
-                var radians = 2 * Math.PI / result.Count * index;
-                var vertical = MathF.Sin((float)radians);
-                var horizontal = MathF.Cos((float)radians);
-                var spawnDir = new Vector3(horizontal, vertical, 0);
-                var spawnPos = transform.position + spawnDir * 30; // Radius is just the distance away from the point
-                string prefabText = labels[1].ToLower().Split(new string[] { "__" }, StringSplitOptions.None)[1];
-                var prefab = Resources.Load($"Prefabs/{prefabText}", typeof(GameObject)) as GameObject;
-                var node = Instantiate(prefab, spawnPos, Quaternion.identity);
-                node.name = $"Node_{id}";
-                node.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
-                var nodeAttributes = node.GetComponent<NodeBehaviour>();
-                nodeAttributes.nodeID = id;
-                nodeAttributes.labels = (List<string>)labels;
-                nodeAttributes.properties = (Dictionary<string, object>)_properties;
-                nodeAttributes.defaultColor = node.GetComponent<Renderer>().material.color;
-
-                expandedNodes.Add(node);
-                AddEdge(node);
-            }
-            expanded = true;
+            //for (int index = 0; index < result.Count; index++)
+            //{
+            //    
+            //    int id = (int)result[index].Item1.Id; // get Node ID (elementID puts some weird pre-fix in front of it, stringparsing could solve this)
+            //    var labels = result[index].Item1.Labels; // get Node labels
+            //    var _properties = result[index].Item1.Properties; // get Node Properties. Since its of type Dictionary one needs to iterate over the key-value pairs
+            //    
+            //    var radians = 2 * Math.PI / result.Count * index;
+            //    var vertical = MathF.Sin((float)radians);
+            //    var horizontal = MathF.Cos((float)radians);
+            //    var spawnDir = new Vector3(horizontal, vertical, 0);
+            //    var spawnPos = transform.position + spawnDir * 30; // Radius is just the distance away from the point
+            //    string prefabText = labels[1].ToLower().Split(new string[] { "__" }, StringSplitOptions.None)[1];
+            //    var prefab = Resources.Load($"Prefabs/{prefabText}", typeof(GameObject)) as GameObject;
+            //    var node = Instantiate(prefab, spawnPos, Quaternion.identity);
+            //    node.name = $"Node_{id}";
+            //    node.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
+            //    var nodeAttributes = node.GetComponent<NodeBehaviour>();
+            //    nodeAttributes.nodeID = id;
+            //    nodeAttributes.labels = (List<string>)labels;
+            //    nodeAttributes.properties = (Dictionary<string, object>)_properties;
+            //    nodeAttributes.defaultColor = node.GetComponent<Renderer>().material.color;
+            //
+            //    expandedNodes.Add(node);
+            //    AddEdge(node);
+            //}
+            //expanded = true;
         }
 
         public void UndoUnfolding()
