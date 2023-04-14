@@ -26,12 +26,11 @@ public class PlayerController : MonoBehaviour
     public Vector2 rotation = Vector2.zero;
 
     public float MovementSpeed = 0.5F;
-    private LineRenderer drawLine;
     private Vector3 CameraStartPosition;
     private Vector3 CameraEndPosition;
     private Quaternion CameraStartRotation;
     private Quaternion CameraEndRotation;
-    private bool DoMovement = false;
+    private bool DoLerping = false;
     private float LerpMovement = 0;
     private GameObject PopUpUI;
     private GameObject Attributes;
@@ -85,11 +84,6 @@ public class PlayerController : MonoBehaviour
         yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
 
         transform.localRotation = xQuat * yQuat;
-        // Lock cursor in window and disable presence
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Cursor.lockState = CursorLockMode.Locked;
-        //}
 
         CheckIfIntersectsWithCamera();
         MoveToPointUpdate();
@@ -119,7 +113,7 @@ public class PlayerController : MonoBehaviour
         Ray ray = new Ray(transform.position,transform.forward);
 
         // Define a maximum distance for the raycast
-        float maxDistance = 120.0f;
+        float maxDistance = 220.0f;
 
         // Create a RaycastHit object to store the result of the raycast
         RaycastHit hit;
@@ -134,16 +128,28 @@ public class PlayerController : MonoBehaviour
             // show PopUpUI;
             PopUpUI.SetActive(true);
             focusedNode = hit.collider;
+            Debug.Log(focusedNode.GetComponent<NodeBehaviour>().focused); // looks like the raycast doesnt keep up with the camera movement. Perhaps just have the 
+            // reverting back to original color done in the node script
             // if camera intersects with THIS object then chasnge text
-            PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {hit.collider.GetComponent<NodeBehaviour>().nodeID}";
-            Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {hit.collider.GetComponent<NodeBehaviour>().properties["rdfs__label"]}\n" +
+            PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {focusedNode.GetComponent<NodeBehaviour>().nodeID}";
+            Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {focusedNode.GetComponent<NodeBehaviour>().properties["rdfs__label"]}\n" +
                $"URI: {hit.collider.GetComponent<NodeBehaviour>().properties["uri"]}";
-            
-            // is lerping actually needed, more of a gimmick
-            // if node is clicked then unfold the node
+
+            // if node is looked at and left mouse button is clicked then go to node;
             if (Input.GetMouseButtonDown(0))
             {
-                if (!focusedNode.transform.GetComponent<NodeBehaviour>().expanded) 
+                // Lerping movement aka move to object when clicked on
+                CameraStartPosition = transform.position;
+                CameraStartRotation = transform.rotation;
+                CameraEndPosition = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z - 70);
+                CameraEndRotation = Quaternion.identity;
+                LerpMovement = 0F;
+                DoLerping = true;
+            }
+            // if node looked at and right mouse button is clicked then unfold the node
+            else if (Input.GetMouseButtonDown(1))
+            {
+                if (!focusedNode.transform.GetComponent<NodeBehaviour>().expanded)
                 {
                     focusedNode.transform.GetComponent<NodeBehaviour>().DoUnfolding();
 
@@ -152,14 +158,7 @@ public class PlayerController : MonoBehaviour
                 {
                     focusedNode.transform.GetComponent<NodeBehaviour>().UndoUnfolding();
                 }
-                
 
-                //    CameraStartPosition = transform.position;
-                //    CameraStartRotation = transform.rotation;
-                //    CameraEndPosition = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z - 70);
-                //    CameraEndRotation = Quaternion.identity;
-                //    LerpMovement = 0F;
-                //    DoMovement = true;
             }
         }
         else
@@ -175,7 +174,7 @@ public class PlayerController : MonoBehaviour
     }
     private void MoveToPointUpdate()
     {
-        if (DoMovement)
+        if (DoLerping)
         {
             transform.position = Vector3.Lerp(CameraStartPosition, CameraEndPosition, LerpMovement);
             transform.rotation = Quaternion.Lerp(CameraStartRotation, CameraEndRotation, LerpMovement);
@@ -183,7 +182,7 @@ public class PlayerController : MonoBehaviour
             if (LerpMovement >= 1F)
             {
                 LerpMovement = 0F;
-                DoMovement = false;
+                DoLerping = false;
                 rotation.x = 0;
                 rotation.y = 0;
             }

@@ -1,12 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Database;
-using UnityEngine.UI;
 using TMPro;
 using System;
-using System.Security.Cryptography;
-using GraphFoundation;
 
 public class QueryParser : MonoBehaviour
 {
@@ -38,6 +33,7 @@ public class QueryParser : MonoBehaviour
         }
         catch (Exception e)
         {     
+            Debug.LogException(e);
             input.text = "";
             input.placeholder.GetComponent<TMP_Text>().text = "PLEASE ENTER VALID QUERY";
             input.placeholder.GetComponent<TMP_Text>().color = Color.red;

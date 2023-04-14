@@ -96,3 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81147dab09184cb42b1de5ecfe0e8026, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  edgeID: 0
+  startNodeID: 0
+  startNode: {fileID: 0}
+  endNodeID: 0
+  endNode: {fileID: 0}
+  typeEdge: 
+  defaultColor: {r: 0, g: 0, b: 0, a: 0}

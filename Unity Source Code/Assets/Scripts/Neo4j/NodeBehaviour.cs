@@ -1,10 +1,6 @@
 using Database;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace GraphFoundation
@@ -23,12 +19,11 @@ namespace GraphFoundation
         public List<SpringJoint> joints = new List<SpringJoint>();
         public Color defaultColor;
 
-        private GameObject EdgePrefab;
         private Neo4jDatabase database;
+        public bool focused = false;
 
         void Start()
         {
-            EdgePrefab = Resources.Load("Prefabs/EdgePrefab", typeof(GameObject)) as GameObject;
             database = GameObject.FindGameObjectWithTag("NodeSpawner").transform.GetComponent<Neo4jConnection>().currentDatabase;
             foreach (var kvp in properties)
             {
@@ -43,31 +38,12 @@ namespace GraphFoundation
         {
 
             GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-            int i = 0;
-            foreach (GameObject edge in expandedEdges)
-            {
-                edge.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-                SpringJoint sj = joints[i];
-                GameObject target = sj.connectedBody.gameObject;
-                edge.transform.LookAt(target.transform);
-                Vector3 ls = edge.transform.localScale;
-                ls.z = Vector3.Distance(transform.position, target.transform.position);
-                edge.transform.localScale = ls;
-                edge.transform.position = new Vector3((transform.position.x + target.transform.position.x) / 2,
-                                  (transform.position.y + target.transform.position.y) / 2,
-                                  (transform.position.z + target.transform.position.z) / 2);
-                i++;
-            }
             // have text rotate around node
             transform.GetComponentInChildren<TextMeshProUGUI>().transform.RotateAround(transform.position, Vector3.up, 20 * Time.deltaTime);
         }
 
         public async void DoUnfolding()
         {   
-            if (GetComponent<Rigidbody>().velocity != new Vector3(0, 0, 0))
-            {
-                GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-            }
             var result = await database.CustomFetch($"MATCH (n)-[r]-(z) WHERE ID(n) = {nodeID} RETURN z, r LIMIT 3", "z", "r");
             //for (int index = 0; index < result.Count; index++)
             //{
@@ -121,17 +97,17 @@ namespace GraphFoundation
 
         public void AddEdge(GameObject n)
         {
-            SpringJoint sj = gameObject.AddComponent<SpringJoint>();
-            sj.autoConfigureConnectedAnchor = false;
-            sj.anchor = new Vector3(0, 0.5f, 0);
-            sj.connectedAnchor = new Vector3(0, 0, 0);
-            sj.enableCollision = true;
-            sj.connectedBody = n.transform.GetComponent<Rigidbody>();
-            sj.spring = 8;
-            GameObject edge = Instantiate(EdgePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            edge.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
-            joints.Add(sj);
-            expandedEdges.Add(edge);
+            //SpringJoint sj = gameObject.AddComponent<SpringJoint>();
+            //sj.autoConfigureConnectedAnchor = false;
+            //sj.anchor = new Vector3(0, 0.5f, 0);
+            //sj.connectedAnchor = new Vector3(0, 0, 0);
+            //sj.enableCollision = true;
+            //sj.connectedBody = n.transform.GetComponent<Rigidbody>();
+            //sj.spring = 8;
+            //GameObject edge = Instantiate(EdgePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+            //edge.transform.parent = GameObject.FindGameObjectWithTag("Graph").transform;
+            //joints.Add(sj);
+            //expandedEdges.Add(edge);
         }
 
     }

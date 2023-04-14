@@ -46,6 +46,7 @@ public class Neo4jConnection : MonoBehaviour
 
         // fetch the starting point nodes
         results = await currentDatabase.CustomFetch(startupQuery, startupKeys);
+        UnityEngine.Debug.Log(graph.transform.GetComponent<GraphManager>());
         graph.transform.GetComponent<GraphManager>().BuildGraph(results);
         //for (int index = 0; index < results.Count; index++)
         //{
