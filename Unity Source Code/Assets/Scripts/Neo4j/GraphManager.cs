@@ -14,6 +14,9 @@ public class GraphManager : MonoBehaviour
     private GameObject EdgePrefab;
     private Vector3 startPosition;
     private Quaternion startRotation;
+    public bool isBuilding = false;
+    public bool isMoving;
+    public bool onscreen;
     // Start is called before the first frame update
     void Start()
     {   
@@ -27,6 +30,40 @@ public class GraphManager : MonoBehaviour
     {
         // Make edges adjust based on how the joints move.
         AdjustEdges();
+        if (isBuilding)
+        {
+            foreach(var node in nodes.Values)
+            {
+                if (node.transform.GetComponent<Rigidbody>().velocity != new Vector3(0, 0, 0))
+                {
+                    isMoving = true;
+                    break;
+                }
+                isMoving = false;
+            }
+            if (!isMoving)
+            {
+                isBuilding = false;
+            }
+ 
+        }
+        else
+        {
+
+            foreach (var node in nodes.Values)
+            {
+                Vector3 screenPoint = Camera.main.WorldToViewportPoint(node.transform.position);
+                onscreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
+                if (! onscreen)
+                {
+                    break;
+                }
+            }
+            if (! onscreen)
+            {
+                Camera.main.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, Camera.main.transform.position.y - 2);
+            }
+        }
     }
 
     private void AdjustEdges()
@@ -50,6 +87,8 @@ public class GraphManager : MonoBehaviour
 
     public void BuildGraph((List<INode>, List<IRelationship>) results)
     {
+        isBuilding = true;
+        isMoving = true;
         ClearGraph();
         // revert camera to starting position;
         ResetCamera();

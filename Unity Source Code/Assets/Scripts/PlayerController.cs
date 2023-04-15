@@ -128,9 +128,9 @@ public class PlayerController : MonoBehaviour
             // show PopUpUI;
             PopUpUI.SetActive(true);
             focusedNode = hit.collider;
-            Debug.Log(focusedNode.GetComponent<NodeBehaviour>().focused); // looks like the raycast doesnt keep up with the camera movement. Perhaps just have the 
+            //Debug.Log(focusedNode.GetComponent<NodeBehaviour>().focused); // looks like the raycast doesnt keep up with the camera movement. Perhaps just have the 
             // reverting back to original color done in the node script
-            // if camera intersects with THIS object then chasnge text
+            // if camera intersects with THIS object then change text
             PopUpUI.GetComponentInChildren<TextMeshProUGUI>().text = $"Node ID: {focusedNode.GetComponent<NodeBehaviour>().nodeID}";
             Attributes.GetComponentInChildren<TextMeshProUGUI>().text = $"RDFS label: {focusedNode.GetComponent<NodeBehaviour>().properties["rdfs__label"]}\n" +
                $"URI: {hit.collider.GetComponent<NodeBehaviour>().properties["uri"]}";

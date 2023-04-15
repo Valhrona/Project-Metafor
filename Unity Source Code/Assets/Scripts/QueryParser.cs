@@ -33,7 +33,6 @@ public class QueryParser : MonoBehaviour
         }
         catch (Exception e)
         {     
-            Debug.LogException(e);
             input.text = "";
             input.placeholder.GetComponent<TMP_Text>().text = "PLEASE ENTER VALID QUERY";
             input.placeholder.GetComponent<TMP_Text>().color = Color.red;
